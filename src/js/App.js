@@ -11,11 +11,12 @@ class App extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.fetchData();
-  }
-
   fetchData() {
+    this.setState({
+      isLoading: true,
+      contacts: []
+    });
+
     fetch('https://randomuser.me/api/?results=50&nat=us,dk,fr,gb')
       .then(res => res.json())
       .then(parsedJson =>
@@ -28,6 +29,34 @@ class App extends React.Component {
       )
       .then(contacts => this.setState({ contacts, isLoading: false }))
       .catch(err => console.log(err));
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    localStorage.setItem('contacts', JSON.stringify(nextState.contacts));
+    localStorage.setItem('contactsDate', Date.now());
+  }
+
+  componentWillMount() {
+    localStorage.getItem('contacts') &&
+      this.setState({
+        contacts: JSON.parse(localStorage.getItem('contacts')),
+        isLoading: false
+      });
+  }
+
+  componentDidMount() {
+    const date = localStorage.getItem('contactsDate');
+    const contactsDate = date && new Date(parseInt(date));
+    const now = new Date();
+
+    const dataAge = Math.round((now - contactsDate) / (1000 * 60)); // In minutes
+    const tooOld = dataAge >= 2;
+
+    if (tooOld) {
+      this.fetchData();
+    } else {
+      console.log(`Using data from localStorage that is ${dataAge} minutes old`);
+    }
   }
 
   render() {
