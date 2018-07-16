@@ -65,7 +65,9 @@ class App extends React.Component {
       <div>
         <header>
           <img src={image} />
-          <h1>Collapsible Content</h1>
+          <h1>Collapsible Content <button className="btn btn-sm btn-danger" onClick={e => this.fetchData()}>
+            Fetch now
+          </button></h1>
         </header>
         <div className={`content ${isLoading ? 'is-loading' : ''}`}>
           <div className="panel-group">
